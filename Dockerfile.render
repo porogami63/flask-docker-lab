@@ -1,0 +1,24 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Copy and install dependencies
+COPY app/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app ./app
+
+# Copy static files
+COPY public ./public
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV FLASK_ENV=production
+ENV PORT=10000
+
+# Expose the port Render expects
+EXPOSE $PORT
+
+# Run the app
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers", "3", "--timeout", "60", "app.main:app"]

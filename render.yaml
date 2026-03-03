@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: taskflow
+    runtime: docker
+    dockerfilePath: Dockerfile.render
+    envVars:
+      - key: MONGO_URI
+        scope: RUN
+        value: ${MONGO_URI}
+      - key: MONGO_DB
+        scope: RUN
+        value: FlaskApp-Docker
+      - key: PORT
+        scope: RUN
+        value: 10000

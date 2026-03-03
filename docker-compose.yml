@@ -1,0 +1,22 @@
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_app
+    env_file:
+      - .env
+    expose:
+      - 5000
+    restart: unless-stopped
+  nginx:
+    image: nginx:stable
+    container_name: nginx_proxy
+    depends_on:
+      - flask
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/nginx.conf:ro
+      - ./public:/app/public:ro
+    restart: unless-stopped
