@@ -12,7 +12,13 @@ from .models import format_item
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), os.pardir, ".env"))
+# Load .env only if it exists (for local development)
+env_path = os.path.join(os.path.dirname(__file__), os.pardir, ".env")
+if os.path.exists(env_path):
+    load_dotenv(dotenv_path=env_path)
+else:
+    # In production (Render), environment variables are set directly
+    logger.info("No .env file found - using environment variables")
 
 MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB = os.getenv("MONGO_DB", "FlaskApp-Docker")
