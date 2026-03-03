@@ -51,11 +51,11 @@ app_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(app_dir)
 public_dir = os.path.join(parent_dir, "public")
 
-# Fallback paths for Docker
+# Fallback path for Docker - check /app/public first
 if not os.path.exists(public_dir):
-    public_dir = "/app/public"
-if not os.path.exists(public_dir):
-    public_dir = os.getcwd()
+    docker_public = "/app/public"
+    if os.path.exists(docker_public):
+        public_dir = docker_public
 
 logger.info(f"Static files directory: {public_dir}")
 logger.info(f"Static files exist: {os.path.exists(public_dir)}")
