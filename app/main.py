@@ -19,23 +19,31 @@ client = MongoClient(MONGO_URI)
 db = client[MONGO_DB]
 items_collection = db.items
 
-# Get the parent directory path for serving static files
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Determine the static folder path - handle both local and Docker environments
+app_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(app_dir)
+public_dir = os.path.join(parent_dir, "public")
 
-app = Flask(__name__, static_folder=os.path.join(BASE_DIR, "public"), static_url_path="")
+# Fallback to common Docker paths
+if not os.path.exists(public_dir):
+    public_dir = os.path.join("/app", "public")
+if not os.path.exists(public_dir):
+    public_dir = os.getcwd()
+
+app = Flask(__name__, static_folder=public_dir, static_url_path="/static")
 
 
 @app.route("/")
 def serve_index():
-    return send_from_directory(os.path.join(BASE_DIR, "public"), "index.html")
+    return send_from_directory(public_dir, "index.html")
 
 
 @app.route("/<path:filename>")
 def serve_static(filename):
-    try:
-        return send_from_directory(os.path.join(BASE_DIR, "public"), filename)
-    except:
-        return send_from_directory(os.path.join(BASE_DIR, "public"), "index.html")
+    filepath = os.path.join(public_dir, filename)
+    if os.path.isfile(filepath):
+        return send_from_directory(public_dir, filename)
+    return send_from_directory(public_dir, "index.html")
 
 
 @app.route("/items", methods=["GET"])
